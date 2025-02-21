@@ -1,0 +1,14 @@
+<footer class="bg-dark text-white text-center py-3 mt-5>
+    <div class="container">
+        <p>&copy; {{ year }} Employee Management System | All Rights Reserved</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const yearSpan = document.querySelector("footer p");
+        if (yearSpan) {
+            yearSpan.innerHTML = "&copy; " + new Date().getFullYear() + " Employee Management System | All Rights Reserved";
+        }
+    });
+</script>

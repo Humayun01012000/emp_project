@@ -1,0 +1,14 @@
+{% extends 'attendance/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Shift Schedule Form{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if form.instance.pk %}Edit Shift Schedule{% else %}Assign New Shift{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">{% if form.instance.pk %}Update{% else %}Assign{% endif %} Shift</button>
+        <a href="{% url 'shift_schedule_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

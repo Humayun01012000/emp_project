@@ -1,0 +1,14 @@
+{% extends 'attendance/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Delete Shift{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-danger">Confirm Delete</h2>
+    <p>Are you sure you want to delete the shift <strong>{{ shift.get_name_display }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'shift_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

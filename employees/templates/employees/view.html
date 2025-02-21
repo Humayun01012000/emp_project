@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h2>Employee List</h2>
+<a href="{% url 'employee_add' %}" class="btn btn-primary">Add Employee</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Floor </th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Date of Birth</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for employee in employees %}
+            <tr>
+                <td>{{ employee.name }} </td>
+                <td> {{ employee.floor }} </td>
+                <td>{{ employee.position }}</td>
+                <td>{{ employee.department }}</td>
+                <td>{{ employee.date_of_birth }}</td>
+                <td>{{ employee.join_date }}</td>
+                <td>${{ employee.salary }}</td>
+                <td>
+                    
+                    <a href="{% url 'employee_detail' employee.id %}" class="btn btn-info">View</a>
+                    <a href="{% url 'edit_employee' employee.id %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'employee_delete' employee.id %}" class="btn btn-danger">Delete</a>
+                    
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

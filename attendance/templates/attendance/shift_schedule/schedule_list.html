@@ -1,0 +1,37 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Shift Schedules{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Shift Schedules</h2>
+    <a href="{% url 'schedule_create' %}" class="btn btn-primary mb-3">Assign New Shift</a>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Employee</th>
+                <th>Shift</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in schedules %}
+            <tr>
+                <td>{{ schedule.employee.name }}</td>
+                <td>{{ schedule.shift.get_name_display }}</td>
+                <td>{{ schedule.start_date }}</td>
+                <td>{{ schedule.end_date }}</td>
+                <td>
+                    <a href="{% url 'schedule_edit' schedule.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'schedule_delete' schedule.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No shift schedules available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

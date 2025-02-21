@@ -1,0 +1,23 @@
+{% extends "attendance/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Add Shift Report Detail</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ report.schedule.employee.name }} - {{ report.schedule.shift.name }}</h5>
+            <p class="card-text"><strong>Report Date:</strong> {{ report.date }}</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <button type="submit" class="btn btn-success">Add Report Detail</button>
+                <a href="{% url 'report_detail' report.id %}" class="btn btn-secondary">Back to Details</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

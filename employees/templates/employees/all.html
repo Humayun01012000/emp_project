@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- View all employees -->
+    <h1>Employee List</h1>
+    <a href="{% url 'employee_add' %}" class="btn btn-secondary mb-4">Add New Employee</a>
+    <!-- Add your employee list here -->
+    <!-- Your code here -->
+    <div class="row">
+        {% if employees %}
+        {% for employee in employees %}
+       
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title"> Name : {{ employee.name }}</h5>
+                <p class="card-text">Employee ID: {{ employee.employee_id }} </p>
+                <p class="card-text">Position: {{ employee.position }} </p>
+                <p class="card-text">Department: {{ employee.department }}</p>
+                <a href="{% url 'employee_detail' employee.id %}" class="btn btn-outline-dark">View Details</a>
+
+            </div>
+        </div>
+        {% empty%}
+        <div class="alert alert-warning" role="alert">No employees found.</div>
+        {% endfor %}
+        {% endif %}
+
+
+
+    </div>
+
+    {% endblock %}

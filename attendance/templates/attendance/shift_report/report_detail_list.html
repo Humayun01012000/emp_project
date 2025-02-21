@@ -1,0 +1,39 @@
+{% extends "attendance/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Shift Report Details</h2>
+    <h5>{{ report.schedule.employee.name }} - {{ report.schedule.shift.name }}</h5>
+    <p><strong>Report Date:</strong> {{ report.date }}</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td>{{ detail.task }}</td>
+                <td>{{ detail.start_time }}</td>
+                <td>{{ detail.end_time }}</td>
+                <td>{{ detail.duration }}</td>
+                <td>
+                    <a href="{% url 'report_detail_list' report.id %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No report details found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'report_detail_create' report.id %}" class="btn btn-primary">Add Report Detail</a>
+</div>
+{% endblock %}

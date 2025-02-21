@@ -1,0 +1,14 @@
+{% extends 'attendance/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Assign New Shift{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Assign New Shift</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Assign Shift</button>
+        <a href="{% url 'schedule_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
