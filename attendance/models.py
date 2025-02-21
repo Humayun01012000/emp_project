@@ -2,7 +2,7 @@ from django.db import models
 from datetime import timedelta
 from employees.models import Employee 
 from datetime import datetime
-
+from datetime import date
 
 # Create your models here.
 
@@ -55,25 +55,36 @@ class ShiftReportDetail(models.Model):
     
 
 
+# employees attendance tracking below  
+
+
+class Attendance(models.Model):
+    STATUS_CHOICES = [
+        ('Present', 'Present'),
+        ('Absent', 'Absent'),
+        ('Late', 'Late'),
+        ('Leave', 'Leave'),
+    ]
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="attendance_records")
+    date = models.DateField(default=date.today)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Absent')
+    check_in = models.TimeField(null=True, blank=True)
+    check_out = models.TimeField(null=True, blank=True)
     
-    
-        
-
-
-
-
-
-
-
-
-
-
-
+    def __str__(self):
+        return f"{self.employee} - {self.date} - {self.status}"
 
 
 
     def __str__(self):
         return f"{self.report.schedule.employee.name} - {self.report.schedule.shift.name} - {self.report.date} - {self.task}"
+
+
+
+
+
+
 #leave request 
 
 class LeaveRequest(models.Model):
@@ -163,67 +174,16 @@ class LeaveReport(models.Model):
 
     def __str__(self):
         return f"{self.leave_attendance.leave_approval.leave_request.employee.name} - {self.leave_attendance.leave_approval.leave_request.leave_type} - {self.leave_attendance.leave_approval.leave_request.start_date} - {self.leave_attendance.leave_approval.leave_request.end_date} - {self.leave_attendance.date}"
-    #leave notification
-    class Meta:
-        verbose_name_plural = "Leave Notifications"
-
-class LeaveNotification(models.Model):
-    leave_report = models.ForeignKey(LeaveReport, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    notification_date = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
     
-    def __str__(self):
-        return f"{self.leave_report.leave_attendance.leave_approval.leave_request.employee.name} - {self.leave_report.leave_attendance.leave_approval.leave_request.leave_type} - {self.leave_report.leave_attendance.leave_approval.leave_request.start_date} - {self.leave_report.leave_attendance.leave_approval.leave_request.end_date} - {self.leave_report.leave_attendance.date} - {self.employee.name} - {self.notification_date} - {self.is_read}"
-    #leave approval history
-    class Meta:
-        verbose_name_plural = "Leave Approval Histories"
 
-class LeaveApprovalHistory(models.Model):
-
-    LEAVE_APPROVAL_STATUS = [
-    ('Pending', 'Pending'),
-    ('Approved', 'Approved'),
-    ('Rejected', 'Rejected'),
-]
-
-
-    leave_approval = models.ForeignKey(LeaveApproval, on_delete=models.CASCADE)
-    previous_status = models.CharField(max_length=10, choices=LEAVE_APPROVAL_STATUS)
-    new_status = models.CharField(max_length=10, choices=LEAVE_APPROVAL_STATUS)
-    updated_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
-        return f"{self.leave_approval.leave_request.employee.name} - {self.leave_approval.leave_request.leave_type} - {self.leave_approval.leave_request.start_date} - {self.leave_approval.leave_request.end_date} - {self.leave_approval.approver.name} - {self.previous_status} - {self.new_status} - {self.updated_at}"
-    #leave attendance history
-    class Meta:
-        verbose_name_plural = "Leave Attendance Histories"
 
 
-class LeaveAttendanceHistory(models.Model):
-    leave_attendance = models.ForeignKey(LeaveAttendance, on_delete=models.CASCADE)
-    previous_status = models.BooleanField(default=False)
-    new_status = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(auto_now_add=True)
+
+
     
-    def __str__(self):
-        return f"{self.leave_attendance.leave_approval.leave_request.employee.name} - {self.leave_attendance.leave_approval.leave_request.leave_type} - {self.leave_attendance.leave_approval.leave_request.start_date} - {self.leave_attendance.leave_approval.leave_request.end_date} - {self.leave_attendance.date} - {self.previous_status} - {self.new_status} - {self.updated_at}"
-    #leave report history
-    class Meta:
-        verbose_name_plural = "Leave Report Histories"
 
 
-# Complated 
 
-class ComplatedLeave(models.Model):
-    leave_request = models.ForeignKey(LeaveRequest, on_delete=models.CASCADE)
-    complated_date = models.DateTimeField(auto_now_add=True)
-    completed_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.leave_request.employee.name} - {self.leave_request.leave_type} - {self.leave_request.start_date} - {self.leave_request.end_date} - {self.completed_by.name} - {self.complated_date}"
-    # complated leave history
-    class Meta:
-        verbose_name_plural = "Completed Leaves"
-        
 

@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models 
+from django.contrib.auth.models import User
 
 class Floor(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -34,6 +35,7 @@ class Position(models.Model):
         return self.title
 
 class Employee(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     employee_id = models.CharField(max_length=20)
     name = models.CharField(max_length=255)
     join_date = models.DateField()

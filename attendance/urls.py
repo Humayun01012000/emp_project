@@ -6,6 +6,7 @@ from .views import (
     ShiftReportListView, ShiftReportCreateView, ShiftReportUpdateView, ShiftReportDeleteView,
     ShiftReportDetailView, create_shift_report_detail,delete_shift_report_detail,
     LeaveRequestListView, LeaveRequestCreateView, LeaveRequestUpdateView, LeaveRequestDeleteView,
+    AttendanceListView, AttendanceCreateView, AttendanceUpdateView
 )
 urlpatterns = [
     # Shift URLs
@@ -45,4 +46,11 @@ urlpatterns = [
     path('leaves/new/', LeaveRequestCreateView.as_view(), name='leave_create'),
     path('leaves/edit/<int:pk>/', LeaveRequestUpdateView.as_view(), name='leave_edit'),
     path('leaves/delete/<int:pk>/', LeaveRequestDeleteView.as_view(), name='leave_delete'),
+
+    # attendance tracking URLs
+
+    path('attendance/', AttendanceListView.as_view(), name='attendance_list'),
+    path('attendance/add/', AttendanceCreateView.as_view(), name='attendance_add'),
+    path('attendance/edit/<int:pk>/', AttendanceUpdateView.as_view(), name='attendance_edit'),
+
 ]

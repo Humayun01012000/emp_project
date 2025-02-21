@@ -1,5 +1,5 @@
 from django import forms
-from .models import Shift, ShiftSchedule, ShiftReport, ShiftReportDetail, LeaveRequest
+from .models import Shift, ShiftSchedule, ShiftReport, ShiftReportDetail, LeaveRequest, Attendance
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
@@ -93,3 +93,17 @@ class LeaveRequestForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Submit Leave Request'))
+
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['employee', 'date', 'status', 'check_in', 'check_out']
+        widgets = {
+            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'placeholder': 'Select Date'}),
+            'check_in': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time', 'placeholder': 'Check-in Time'}),
+            'check_out': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time', 'placeholder': 'Check-out Time'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'employee': forms.Select(attrs={'class': 'form-control'}),
+        }
+

@@ -1,0 +1,33 @@
+{% extends 'attendance/base.html' %}
+{% block content %}
+<h2>Employee Attendance</h2>
+<a href="{% url 'attendance_add' %}" class="btn btn-primary">Mark Attendance</a>
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attendance in attendances %}
+        <tr>
+            <td>{{ attendance.employee }}</td>
+            <td>{{ attendance.date }}</td>
+            <td>{{ attendance.status }}</td>
+            <td>{{ attendance.check_in|default:"-" }}</td>
+            <td>{{ attendance.check_out|default:"-" }}</td>
+            <td>
+                <a href="{% url 'attendance_edit' attendance.id %}" class="btn btn-warning btn-sm">Edit</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No attendance records found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

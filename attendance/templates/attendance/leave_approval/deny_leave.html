@@ -1,0 +1,45 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Deny Leave Requests</h2>
+
+    {% if leave_requests %}
+        <form method="post">
+            {% csrf_token %}
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Reason for Denial</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave_request in leave_requests %}
+                    <tr>
+                        <td>{{ leave_request.employee.name }}</td>
+                        <td>{{ leave_request.leave_type }}</td>
+                        <td>{{ leave_request.start_date }}</td>
+                        <td>{{ leave_request.end_date }}</td>
+                        <td>
+                            <textarea name="comment_{{ leave_request.id }}" class="form-control" required></textarea>
+                        </td>
+                        <td>
+                            <button type="submit" name="deny" value="{{ leave_request.id }}" class="btn btn-danger">Deny</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    {% else %}
+        <p class="alert alert-info">No leave requests pending denial.</p>
+    {% endif %}
+
+    <a href="{% url 'leave_approval_list' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}

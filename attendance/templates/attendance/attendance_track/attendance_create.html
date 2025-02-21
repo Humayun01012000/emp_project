@@ -1,0 +1,12 @@
+{% extends 'attendance/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>{% if form.instance.pk %}Create Attendance{% else %}Mark Attendance{% endif %}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+{% endblock %}

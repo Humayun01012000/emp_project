@@ -1,10 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseRedirect 
+from django.urls import reverse
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from .models import Shift, ShiftSchedule, ShiftReport, ShiftReportDetail, LeaveRequest
-from .forms import ShiftForm, ShiftScheduleForm, ShiftReportForm, ShiftReportDetailForm, LeaveRequestForm
+from .models import Shift, ShiftSchedule, ShiftReport, ShiftReportDetail, LeaveRequest, LeaveApproval, Attendance
+from employees.models import Employee
+from .forms import ShiftForm, ShiftScheduleForm, ShiftReportForm, ShiftReportDetailForm, LeaveRequestForm, AttendanceForm
 from datetime import datetime 
+from django.contrib.auth.decorators import login_required
+
+
 # Shift Views
 class ShiftListView(ListView):
     model = Shift
@@ -154,3 +160,44 @@ class LeaveRequestDeleteView(DeleteView):
     model = LeaveRequest
     template_name = 'attendance/leave_report/leave_confirm_delete.html'
     success_url = reverse_lazy('leave_list')
+
+
+# Leave Approveal Report 
+
+# class LeaveApprovalListView(ListView):
+#     model = LeaveRequest
+#     template_name = 'attendance/leave_approval/leave_approval_list.html'
+#     context_object_name = 'leave_requests'
+#     def get_queryset(self):
+#         return LeaveRequest.objects.filter(leave_report__isnull=True)
+
+
+
+# View all attendance records
+class AttendanceListView(ListView):
+    model = Attendance
+    template_name = 'attendance/attendance_track/attendance_list.html'
+    context_object_name = 'attendances'
+    ordering = ['-date']
+
+# Mark attendance
+class AttendanceCreateView(CreateView):
+    model = Attendance
+    form_class = AttendanceForm
+    template_name = 'attendance/attendance_track/attendance_create.html'
+    success_url = reverse_lazy('attendance_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Attendance marked successfully!")
+        return super().form_valid(form)
+
+# Update attendance record
+class AttendanceUpdateView(UpdateView):
+    model = Attendance
+    form_class = AttendanceForm
+    template_name = 'attendance/attendance_track/attendance_form.html'
+    success_url = reverse_lazy('attendance_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Attendance updated successfully!")
+        return super().form_valid(form)
