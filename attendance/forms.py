@@ -107,3 +107,27 @@ class AttendanceForm(forms.ModelForm):
             'employee': forms.Select(attrs={'class': 'form-control'}),
         }
 
+
+    def clean(self):
+        cleaned_data = super().clean()
+        employee = cleaned_data.get("employee")
+        check_in = cleaned_data.get("check_in")
+        check_out = cleaned_data.get("check_out")
+        date = cleaned_data.get("date")
+
+        assigned_schedule = ShiftSchedule.objects.filter(
+            employee=employee, start_date__lte=date, end_date__gte=date
+        ).first()
+
+        if assigned_schedule:
+            shift = assigned_schedule.shift
+            shift_start = shift.start_time
+            shift_end = shift.end_time
+
+            if check_in and check_in < shift_start:
+                raise forms.ValidationError("Check-in before shift start is not allowed.")
+
+            if check_out and check_out > shift_end:
+                raise forms.ValidationError("Check-out after shift end is not allowed.")
+
+        return cleaned_data

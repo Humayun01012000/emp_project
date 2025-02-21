@@ -1,0 +1,76 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Monthly Attendance Report{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="my-3">Monthly Attendance Report</h2>
+        <button id="export-btn" class="btn btn-primary">Export as CSV</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Date</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="attendance-table">
+                {% for record in attendance_records %}
+                <tr>
+                    <td>{{ record.employee.name }}</td>
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.check_in|default:"-" }}</td>
+                    <td>{{ record.check_out|default:"-" }}</td>
+                    <td>
+                        {% if record.status == "Present" %}
+                            <span class="badge bg-success">Present</span>
+                        {% elif record.status == "Absent" %}
+                            <span class="badge bg-danger">Absent</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No records available for this month.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Export Table Data as CSV
+        document.getElementById("export-btn").addEventListener("click", function() {
+            let table = document.getElementById("attendance-table");
+            let csv = [];
+            let rows = table.querySelectorAll("tr");
+
+            for (let row of rows) {
+                let cols = row.querySelectorAll("td, th");
+                let rowData = [];
+                cols.forEach(col => rowData.push(col.innerText.trim()));
+                csv.push(rowData.join(","));
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "attendance_report.csv");
+            document.body.appendChild(link);
+            link.click();
+        });
+    });
+</script>
+
+{% endblock %}

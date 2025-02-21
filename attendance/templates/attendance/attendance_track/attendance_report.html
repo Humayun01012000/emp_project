@@ -1,0 +1,62 @@
+{% extends "attendance/base.html" %}
+
+{% block title %}Attendance Report{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Attendance Report</h2>
+    <form method="GET">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Employee:</label>
+                <select name="employee" class="form-control">
+                    <option value="">All Employees</option>
+                    {% for emp in employees %}
+                    <option value="{{ emp.id }}" {% if request.GET.employee == emp.id|stringformat:"s" %}selected{% endif %}>
+                        {{ emp.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Start Date:</label>
+                <input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label>End Date:</label>
+                <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary mt-4">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in attendance_records %}
+            <tr>
+                <td>{{ record.employee.name }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.status }}</td>
+                <td>{{ record.check_in|default:"N/A" }}</td>
+                <td>{{ record.check_out|default:"N/A" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

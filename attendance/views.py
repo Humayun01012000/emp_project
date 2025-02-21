@@ -2,13 +2,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect 
 from django.urls import reverse
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy 
+from django.utils.timezone import now
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from .models import Shift, ShiftSchedule, ShiftReport, ShiftReportDetail, LeaveRequest, LeaveApproval, Attendance
 from employees.models import Employee
 from .forms import ShiftForm, ShiftScheduleForm, ShiftReportForm, ShiftReportDetailForm, LeaveRequestForm, AttendanceForm
 from datetime import datetime 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required 
+
 
 
 # Shift Views
@@ -174,30 +176,72 @@ class LeaveRequestDeleteView(DeleteView):
 
 
 # View all attendance records
-class AttendanceListView(ListView):
-    model = Attendance
-    template_name = 'attendance/attendance_track/attendance_list.html'
-    context_object_name = 'attendances'
-    ordering = ['-date']
+def attendance_list(request):
+    attendance_records = Attendance.objects.all().order_by('-date')
+    return render(request, 'attendance/attendance_track/attendance_list.html', {'attendance_records': attendance_records})
 
 # Mark attendance
-class AttendanceCreateView(CreateView):
-    model = Attendance
-    form_class = AttendanceForm
-    template_name = 'attendance/attendance_track/attendance_create.html'
-    success_url = reverse_lazy('attendance_list')
-
-    def form_valid(self, form):
-        messages.success(self.request, "Attendance marked successfully!")
-        return super().form_valid(form)
+def attendance_create(request):
+    if request.method == "POST":
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attendance record added successfully!")
+            return redirect('attendance_list')
+    else:
+        form = AttendanceForm()
+    
+    return render(request, 'attendance/attendance_track/attendance_form.html', {'form': form})
 
 # Update attendance record
-class AttendanceUpdateView(UpdateView):
-    model = Attendance
-    form_class = AttendanceForm
-    template_name = 'attendance/attendance_track/attendance_form.html'
-    success_url = reverse_lazy('attendance_list')
+def attendance_update(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    
+    if request.method == "POST":
+        form = AttendanceForm(request.POST, instance=attendance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attendance record updated successfully!")
+            return redirect('attendance_list')
+    else:
+        form = AttendanceForm(instance=attendance)
+    
+    return render(request, 'attendance/attendance_track/attendance_form.html', {'form': form})
 
-    def form_valid(self, form):
-        messages.success(self.request, "Attendance updated successfully!")
-        return super().form_valid(form)
+
+# Delete attendance record
+
+def attendance_delete(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    if request.method == "POST":
+        attendance.delete()
+        messages.success(request, "Attendance record deleted successfully!")
+        return redirect('attendance_list')
+
+    return render(request, 'attendance/attendance_track/attendance_confirm_delete.html', {'attendance': attendance})
+
+# monthly attendance count 
+
+
+
+
+def attendance_report(request):
+    employees = Employee.objects.all()
+    attendance_records = Attendance.objects.all()
+
+    # Filtering based on user input
+    employee_id = request.GET.get('employee')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if employee_id:
+        attendance_records = attendance_records.filter(employee_id=employee_id)
+    if start_date:
+        attendance_records = attendance_records.filter(date__gte=start_date)
+    if end_date:
+        attendance_records = attendance_records.filter(date__lte=end_date)
+
+    return render(request, 'attendance/attendance_track/attendance_report.html', {
+        'employees': employees,
+        'attendance_records': attendance_records
+    })

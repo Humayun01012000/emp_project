@@ -1,8 +1,10 @@
 from django.db import models
+from django.db.models import F, ExpressionWrapper, DurationField
+from django.core.exceptions import ValidationError
+
 from datetime import timedelta
 from employees.models import Employee 
-from datetime import datetime
-from datetime import date
+from datetime import datetime, date
 
 # Create your models here.
 
@@ -53,6 +55,8 @@ class ShiftReportDetail(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f"{self.report.schedule.employee.name} - {self.report.schedule.shift.name} - {self.report.date} - {self.task}"
 
 
 # employees attendance tracking below  
@@ -71,15 +75,32 @@ class Attendance(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Absent')
     check_in = models.TimeField(null=True, blank=True)
     check_out = models.TimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        assigned_schedule = ShiftSchedule.objects.filter(
+            employee=self.employee, start_date__lte=self.date, end_date__gte=self.date
+        ).first()
+
+        if assigned_schedule:
+            shift = assigned_schedule.shift
+            shift_start = datetime.combine(date.min, shift.start_time)
+            shift_end = datetime.combine(date.min, shift.end_time)
+
+            if self.check_in:
+                check_in_time = datetime.combine(date.min, self.check_in)
+                if check_in_time < shift_start:
+                    raise ValidationError("Check-in before shift start is not allowed.")
+                elif check_in_time > shift_start + timedelta(minutes=15):  # Allow 15 min buffer
+                    self.status = "Late"
+
+            if self.check_out:
+                check_out_time = datetime.combine(date.min, self.check_out)
+                if check_out_time > shift_end + timedelta(minutes=30):  # Allow 30 min buffer
+                    raise ValidationError("Check-out after allowed overtime is not allowed.")
+
+        super().save(*args, **kwargs)
+
     
-    def __str__(self):
-        return f"{self.employee} - {self.date} - {self.status}"
-
-
-
-    def __str__(self):
-        return f"{self.report.schedule.employee.name} - {self.report.schedule.shift.name} - {self.report.date} - {self.task}"
-
 
 
 
